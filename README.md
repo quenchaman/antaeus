@@ -46,7 +46,7 @@ If you use homebrew on MacOS `brew install sqlite`.
 Install docker for your platform
 
 ```
-docker build -t antaeus
+docker build -t antaeus .
 docker run antaeus
 ```
 
@@ -86,3 +86,44 @@ The code given is structured as follows. Feel free however to modify the structu
 * [Sqlite3](https://sqlite.org/index.html) - Database storage engine
 
 Happy hacking 😁!
+
+### Invoice processing feature
+#### Strategic design
+On the first day of each month, charge all unpaid invoices. At the end, all invoices should be charged, except for the cases when the customer does not exist in the payment service. Such cases should be recorded.
+
+#### Tactical design
+* Problem: How we will schedule and run the procedure? 
+* Solution: Expose REST endpoint to trigger the procedure. Use SNS and CloudWatch to call the endpoint at specific time and call it every first day of a month at a time when traffic to the service is minimal (night time).
+* Alternatives: CRON if we have only one instance of the service, otherwise it can cause race conditions.
+---
+* Problem: How do we get all unpaid invoices?
+* Solution: Add a procedure to select all Invoices with unpaid status. Use it in the solution's procedure.
+* Further improvements: If the Invoices have a date we can select a date range for the previous month and have the problematic invoices handled by separate schedule. Otherwise each month the DB scan will grow larger.  
+---
+* Problem: How do we charge the invoices?
+* Solution: Call the external API for every invoice that is not paid. Do it in parallel.
+---
+* Problem: How we handle failed calls with CustomerNotFoundException to the external API for charging an invoice?
+* Solution: Do not retry this call, email or at least log the fact so that the appropriate department can resolve it.
+---
+* Problem: How we handle failed calls with CurrencyMismatchException to the external API for charging an invoice?
+* Solution: Call external API to convert the amount of the Invoice to the currency of the customer.
+* Alternatives: Do the conversion ourselves ...not an alternative really..:)
+---
+* Problem: How we handle failed calls with NetworkException to the external API for charging an invoice?
+* Solution: Retry 3 times...This may not be enough to finish our work on the invoices...
+---
+* Problem: What if the Payment service is not available?
+* Solution: We should really use a message queue between us and the payment service to make sure that we have some temporary storage for the invoice charge events if the service is not available.
+---
+---
+#### With what should I start first?
+1. Getting all non-paid invoices. DAO-level method.
+2. Check if there is mismatch in currencies between customer and invoice. Not sure where to put this yet.
+3. Do the actual requests to the Payment service.
+4. Create REST endpoint to activate the procedure.
+
+#### What I will not do and why
+What: Test trivial DAO level methods
+Why: Getting the unpaid invoices is just a simple select with WHERE clause..I will not test if SQL is doing it's job... :)
+(This section has questionable value...see if it lasts)
