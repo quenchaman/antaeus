@@ -87,6 +87,7 @@ The code given is structured as follows. Feel free however to modify the structu
 
 Happy hacking 😁!
 
+I :heart: Kotlin!!! I'd love to get this job! :sob:
 ### Invoice processing feature
 #### Strategic design
 On the first day of each month, charge all unpaid invoices. At the end, all invoices should be charged, except for the cases when the customer does not exist in the payment service. Such cases should be recorded.
@@ -134,6 +135,7 @@ On the first day of each month, charge all unpaid invoices. At the end, all invo
 #### Good ideas
 - Return immediately from the controller that activates the billing, so that the client can do other useful work
 - Introduce logging.
+- Test coverage report.
 
 #### What I will not do and why
 What: Test DAL level methods
@@ -147,3 +149,7 @@ Why: With in memory DB I will just map the customers to invoices where needed, n
 - Having separate database for testing is a good practice. I will just cleanup the current one when testing.
 - Creating a Dal abstraction for the common operations on a table.
 - Create a REST endpoint on which the client can check the status of the billing.
+- Handle case when customer is null for an invoice.
+
+#### Things I could not figure out how to do
+- I could not map a Pair<T, U?> to Pair<T, U> with the help of filter with U != null .... :/
