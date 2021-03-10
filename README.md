@@ -117,7 +117,11 @@ On the first day of each month, charge all unpaid invoices. At the end, all invo
 * Solution: We should really use a message queue between us and the payment service to make sure that we have some temporary storage for the invoice charge events if the service is not available.
 ---
 ---
-#### With what should I start first?
+
+#### Initial Flow diagram
+![sequence diagram](https://github.com/quenchaman/antaeus/blob/master/CustomerPaymentsDesign.svg?raw=true)
+
+#### My initial plan
 1. Method to fetch invoice by status. DAO-level method.
 2. Method to fetch unpaid invoices in InvoiceService that returns a Pair<Invoice, Customer>
 3. ExchangeInvoice method in Invoice Service that will check if there is a mismatch and send to ExchangeService for fix.

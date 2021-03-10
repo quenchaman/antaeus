@@ -38,8 +38,12 @@ class AntaeusDal(private val db: Database) {
         }
     }
 
-    fun fetchUnpaidByStatus(status: InvoiceStatus): List<Invoice> {
-        throw NotImplementedError()
+    fun fetchInvoicesByStatus(status: InvoiceStatus): List<Invoice> {
+        return transaction(db) {
+            InvoiceTable
+                .select { InvoiceTable.status.eq(status.name) }
+                .map { it.toInvoice() }
+        }
     }
 
     fun createInvoice(amount: Money, customer: Customer, status: InvoiceStatus = InvoiceStatus.PENDING): Invoice? {
