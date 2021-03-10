@@ -107,8 +107,8 @@ On the first day of each month, charge all unpaid invoices. At the end, all invo
 * Solution: Do not retry this call, email or at least log the fact so that the appropriate department can resolve it.
 ---
 * Problem: How we handle failed calls with CurrencyMismatchException to the external API for charging an invoice?
-* Solution: Call external API to convert the amount of the Invoice to the currency of the customer.
-* Alternatives: Do the conversion ourselves ...not an alternative really..:)
+* Solution: Call external API to convert the amount of the Invoice to the currency of the customer. I would check the customer currency and invoice currency and send request to exchange the currencies in the invoice without actually persisting it on our end with the customer's currency.
+* Alternatives: Do the conversion ourselves ...not a good alternative..:)
 ---
 * Problem: How we handle failed calls with NetworkException to the external API for charging an invoice?
 * Solution: Retry 3 times...This may not be enough to finish our work on the invoices...
@@ -118,12 +118,28 @@ On the first day of each month, charge all unpaid invoices. At the end, all invo
 ---
 ---
 #### With what should I start first?
-1. Getting all non-paid invoices. DAO-level method.
-2. Check if there is mismatch in currencies between customer and invoice. Not sure where to put this yet.
-3. Do the actual requests to the Payment service.
-4. Create REST endpoint to activate the procedure.
+1. Method to fetch invoice by status. DAO-level method.
+2. Method to fetch unpaid invoices in InvoiceService that returns a Pair<Invoice, Customer>
+3. ExchangeInvoice method in Invoice Service that will check if there is a mismatch and send to ExchangeService for fix.
+4. a method in BillingService that gathers invoices, checks currency mismatch and calls a method to dispatch to PaymentService
+5. method in BillingService that receives invoices and fires off requests to payment service.
+6. Create REST endpoint to activate the procedure.
+
+(Note: methods 4 and 5 may be one method)
+
+#### Good ideas
+- Return immediately from the controller that activates the billing, so that the client can do other useful work
+- Introduce logging.
 
 #### What I will not do and why
-What: Test trivial DAO level methods
-Why: Getting the unpaid invoices is just a simple select with WHERE clause..I will not test if SQL is doing it's job... :)
-(This section has questionable value...see if it lasts)
+What: Test DAL level methods
+Why: There should not be any business logic in a DAL method, so nothing to unit test. The connection to database will be tested during integration tests via other services that call the DAL.
+---
+What: I will not use JOINs between Invoice and Customer and change the customerId to customer in Invoice.
+Why: With in memory DB I will just map the customers to invoices where needed, no memory overhead, but surely performance will suffer. If I go the route of changing Invoice model I will break the contract with PaymentProvider and it has to rebuild and redeploy. I can invent a new invoice class used just for carrying the Customer for the currency check, but for simplicity I will not.
+
+#### I won't have time for...
+- ExchangeProvider will make network requests to convert currency and there many things can go wrong, but I won't cover all cases.
+- Having separate database for testing is a good practice. I will just cleanup the current one when testing.
+- Creating a Dal abstraction for the common operations on a table.
+- Create a REST endpoint on which the client can check the status of the billing.
