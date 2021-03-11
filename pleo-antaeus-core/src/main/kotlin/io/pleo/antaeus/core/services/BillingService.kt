@@ -1,5 +1,6 @@
 package io.pleo.antaeus.core.services
 
+import kotlinx.coroutines.*
 import io.pleo.antaeus.core.exceptions.CurrencyMismatchException
 import io.pleo.antaeus.core.exceptions.CustomerNotFoundException
 import io.pleo.antaeus.core.exceptions.NetworkException
@@ -21,8 +22,15 @@ class BillingService(
 
     }
 
-    fun charge() {
-        prepareInvoicesForPayment().forEach { charge(it) }
+    fun charge() = runBlocking {
+        prepareInvoicesForPayment()
+            .map { invoice ->
+                async(Dispatchers.IO) {
+                    charge(invoice)
+                }
+            }
+            .mapNotNull { invoiceCall -> invoiceCall.await() }
+            .forEach { invoice -> println(invoice) }
     }
 
     /*
