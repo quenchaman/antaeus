@@ -101,4 +101,15 @@ class InvoiceServiceTest {
         Assertions.assertEquals(customer2.id, actualInvoices[1].second?.id)
         Assertions.assertEquals(customer3.id, actualInvoices[2].second?.id)
     }
+
+    @Test
+    fun `will have method to update invoice status and it calls dal`() {
+        val dal = mockk<AntaeusDal> {
+            every { updateInvoiceStatus(any(), any()) } returns InvoiceFactory.create()
+        }
+        val invoiceService = InvoiceService(dal = dal)
+
+        invoiceService.changeStatus(1, InvoiceStatus.PAID)
+        verify(exactly = 1) { dal.updateInvoiceStatus(any(), any()) }
+    }
 }

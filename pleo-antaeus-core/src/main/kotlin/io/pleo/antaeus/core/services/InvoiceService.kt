@@ -23,4 +23,8 @@ class InvoiceService(private val dal: AntaeusDal) {
     fun fetchUnpaid(): List<Pair<Invoice, Customer>> {
         return dal.fetchInvoicesByStatus(InvoiceStatus.PENDING)
     }
+
+    fun changeStatus(id: Int, status: InvoiceStatus): Invoice? {
+        return dal.updateInvoiceStatus(id, status)
+    }
 }
