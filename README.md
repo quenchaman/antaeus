@@ -157,6 +157,10 @@ Why: With in memory DB I will just map the customers to invoices where needed, n
 
 #### Things I could not figure out how to do
 - I could not map a Pair<T, U?> to Pair<T, U> with the help of filter with U != null .... :/
+- How to mock a method in the same class that I am testing?
 
 #### 11.03.2021
 I moved the joining of Invoices and Customer to the data-access layer and I am happy with the result.
+
+#### 12.03.2021
+Implemented synchronous calls to ExchangeProvider::charge method, but I do not handle retries...I will attempt to make the calls in parallel and handle retries too. 
