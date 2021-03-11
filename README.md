@@ -136,6 +136,7 @@ On the first day of each month, charge all unpaid invoices. At the end, all invo
 - Return immediately from the controller that activates the billing, so that the client can do other useful work
 - Introduce logging.
 - Test coverage report.
+- It does not seem like a good design to fetch customer inside exchange service and other services, this should be non-nullable parameter to the methods
 
 #### What I will not do and why
 What: Test DAL level methods
@@ -145,7 +146,7 @@ What: I will not use JOINs between Invoice and Customer and change the customerI
 Why: With in memory DB I will just map the customers to invoices where needed, no memory overhead, but surely performance will suffer. If I go the route of changing Invoice model I will break the contract with PaymentProvider and it has to rebuild and redeploy. I can invent a new invoice class used just for carrying the Customer for the currency check, but for simplicity I will not.
 
 #### I won't have time for...
-- ExchangeProvider will make network requests to convert currency and there many things can go wrong, but I won't cover all cases.
+- ExchangeProvider will make network requests to convert currency and there many things can go wrong, but I will cover only the happy path.
 - Having separate database for testing is a good practice. I will just cleanup the current one when testing.
 - Creating a Dal abstraction for the common operations on a table.
 - Create a REST endpoint on which the client can check the status of the billing.
@@ -153,3 +154,6 @@ Why: With in memory DB I will just map the customers to invoices where needed, n
 
 #### Things I could not figure out how to do
 - I could not map a Pair<T, U?> to Pair<T, U> with the help of filter with U != null .... :/
+
+#### 11.03.2021
+I moved the joining of Invoices and Customer to the data-access layer and I am happy with the result.

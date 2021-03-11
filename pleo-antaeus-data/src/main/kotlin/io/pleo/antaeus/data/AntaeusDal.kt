@@ -38,11 +38,11 @@ class AntaeusDal(private val db: Database) {
         }
     }
 
-    fun fetchInvoicesByStatus(status: InvoiceStatus): List<Invoice> {
+    fun fetchInvoicesByStatus(status: InvoiceStatus): List<Pair<Invoice, Customer>> {
         return transaction(db) {
-            InvoiceTable
+            (InvoiceTable innerJoin CustomerTable)
                 .select { InvoiceTable.status.eq(status.name) }
-                .map { it.toInvoice() }
+                .map { Pair(it.toInvoice(), it.toCustomer()) }
         }
     }
 

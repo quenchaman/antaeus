@@ -20,8 +20,7 @@ class InvoiceService(private val dal: AntaeusDal) {
         return dal.fetchInvoice(id) ?: throw InvoiceNotFoundException(id)
     }
 
-    fun fetchUnpaid(): List<Pair<Invoice, Customer?>> {
+    fun fetchUnpaid(): List<Pair<Invoice, Customer>> {
         return dal.fetchInvoicesByStatus(InvoiceStatus.PENDING)
-            .map { invoice -> Pair(invoice, dal.fetchCustomer(invoice.customerId)) }
     }
 }

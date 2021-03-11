@@ -15,13 +15,13 @@ class InvoiceServiceTest {
 
     private val defaultCustomer = Customer(id = 1, currency = Currency.GBP)
 
-    private val unpaidInvoices = listOf(
+    private val unpaidInvoices: List<Pair<Invoice, Customer>> = listOf(
         InvoiceFactory.create(),
         InvoiceFactory.create(),
         InvoiceFactory.create(),
         InvoiceFactory.create(),
         InvoiceFactory.create()
-    )
+    ).map { Pair(it, defaultCustomer) }
 
     @Test
     fun `will throw if invoice is not found`() {
@@ -37,40 +37,37 @@ class InvoiceServiceTest {
     }
 
     @Test
-    fun `method should return unpaid invoices with customer`() {
+    fun `will return unpaid invoices with customer`() {
         val dal = mockk<AntaeusDal> {
             every { fetchInvoicesByStatus(InvoiceStatus.PENDING) } returns unpaidInvoices
-            every { fetchCustomer(1) } returns defaultCustomer
         }
         val invoiceService = InvoiceService(dal = dal)
-        val invoices: List<Pair<Invoice, Customer?>> = invoiceService.fetchUnpaid()
+        val invoices: List<Pair<Invoice, Customer>> = invoiceService.fetchUnpaid()
 
         verify(exactly = 1) { dal.fetchInvoicesByStatus(InvoiceStatus.PENDING) }
         Assertions.assertTrue(invoices.isNotEmpty())
         Assertions.assertEquals(unpaidInvoices.size, invoices.size)
 
-        val someInvoice: Pair<Invoice, Customer?> = invoices.first()
+        val someInvoice: Pair<Invoice, Customer> = invoices.first()
         Assertions.assertEquals(InvoiceStatus.PENDING, someInvoice.first.status)
-        Assertions.assertEquals(someInvoice.first.customerId, someInvoice.second?.id)
+        Assertions.assertEquals(someInvoice.first.customerId, someInvoice.second.id)
     }
 
     @Test
-    fun `method should return only unpaid invoices`() {
+    fun `will return only unpaid invoices`() {
         val dal = mockk<AntaeusDal> {
             every { fetchInvoicesByStatus(InvoiceStatus.PENDING) } returns unpaidInvoices
-            every { fetchCustomer(1) } returns defaultCustomer
         }
         val invoiceService = InvoiceService(dal = dal)
-        val invoices: List<Pair<Invoice, Customer?>> = invoiceService.fetchUnpaid()
+        val invoices: List<Pair<Invoice, Customer>> = invoiceService.fetchUnpaid()
 
         invoices.forEach { Assertions.assertEquals(InvoiceStatus.PENDING, it.first.status) }
     }
 
     @Test
-    fun `should return an empty list when there are no invoices in the db`() {
+    fun `will return an empty list when there are no invoices in the db`() {
         val dal = mockk<AntaeusDal> {
             every { fetchInvoicesByStatus(InvoiceStatus.PENDING) } returns emptyList()
-            every { fetchCustomer(1) } returns defaultCustomer
         }
 
         val invoiceService = InvoiceService(dal = dal)
@@ -79,20 +76,21 @@ class InvoiceServiceTest {
     }
 
     @Test
-    fun `should join invoice properly with customer`() {
+    fun `will join invoice properly with customer`() {
         val customer1 = Customer(id = 1, currency = Currency.DKK)
         val customer2 = Customer(id = 2, currency = Currency.SEK)
         val customer3 = Customer(id = 3, currency = Currency.USD)
         val invoice1: Invoice = InvoiceFactory.create(customerId = customer1.id)
         val invoice2: Invoice = InvoiceFactory.create(customerId = customer2.id)
         val invoice3: Invoice = InvoiceFactory.create(customerId = customer3.id)
-        val unpaidInvoices = listOf(invoice1, invoice2, invoice3)
+        val unpaidInvoices = listOf(
+            Pair(invoice1, customer1),
+            Pair(invoice2, customer2),
+            Pair(invoice3, customer3)
+        )
 
         val dal = mockk<AntaeusDal> {
             every { fetchInvoicesByStatus(InvoiceStatus.PENDING) } returns unpaidInvoices
-            every { fetchCustomer(1) } returns customer1
-            every { fetchCustomer(2) } returns customer2
-            every { fetchCustomer(3) } returns customer3
         }
 
         val invoiceService = InvoiceService(dal = dal)
