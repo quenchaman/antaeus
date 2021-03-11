@@ -117,6 +117,9 @@ On the first day of each month, charge all unpaid invoices. At the end, all invo
 * Problem: What if the Payment service is not available?
 * Solution: We should really use a message queue between us and the payment service to make sure that we have some temporary storage for the invoice charge events if the service is not available.
 ---
+* Problem: How to make sure that REST endpoint to trigger the billing is omnipotent and we do not charge customer more than once?
+* Solution: ???...Marking the invoices with a status in a transactional way will prevent billing them twice, because we get only the unpaid invoices.
+---
 ---
 
 #### Initial Flow diagram
