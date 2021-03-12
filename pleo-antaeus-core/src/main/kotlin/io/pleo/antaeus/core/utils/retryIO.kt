@@ -13,7 +13,6 @@ internal suspend fun retryIO(
     var currentDelay = initialDelay
     repeat(times - 1) {
         val success: Boolean = block()
-        println("Retry dage: " + !success)
 
         if (success) {
             return success

@@ -4,5 +4,6 @@ enum class InvoiceStatus {
     PENDING,
     PAID,
     CUSTOMER_NOT_FOUND,
-    CURRENCY_MISMATCH
+    CURRENCY_MISMATCH,
+    SENT_FOR_PAYMENT
 }

@@ -39,12 +39,14 @@ class InvoiceServiceTest {
     @Test
     fun `will return unpaid invoices with customer`() {
         val dal = mockk<AntaeusDal> {
-            every { fetchInvoicesByStatus(InvoiceStatus.PENDING) } returns unpaidInvoices
+            every {
+                fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
+            } returns unpaidInvoices
         }
         val invoiceService = InvoiceService(dal = dal)
         val invoices: List<Pair<Invoice, Customer>> = invoiceService.fetchUnpaid()
 
-        verify(exactly = 1) { dal.fetchInvoicesByStatus(InvoiceStatus.PENDING) }
+        verify(exactly = 1) { dal.fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT) }
         Assertions.assertTrue(invoices.isNotEmpty())
         Assertions.assertEquals(unpaidInvoices.size, invoices.size)
 
@@ -56,7 +58,9 @@ class InvoiceServiceTest {
     @Test
     fun `will return only unpaid invoices`() {
         val dal = mockk<AntaeusDal> {
-            every { fetchInvoicesByStatus(InvoiceStatus.PENDING) } returns unpaidInvoices
+            every {
+                fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
+            } returns unpaidInvoices
         }
         val invoiceService = InvoiceService(dal = dal)
         val invoices: List<Pair<Invoice, Customer>> = invoiceService.fetchUnpaid()
@@ -67,7 +71,9 @@ class InvoiceServiceTest {
     @Test
     fun `will return an empty list when there are no invoices in the db`() {
         val dal = mockk<AntaeusDal> {
-            every { fetchInvoicesByStatus(InvoiceStatus.PENDING) } returns emptyList()
+            every {
+                fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
+            } returns emptyList()
         }
 
         val invoiceService = InvoiceService(dal = dal)
@@ -90,7 +96,7 @@ class InvoiceServiceTest {
         )
 
         val dal = mockk<AntaeusDal> {
-            every { fetchInvoicesByStatus(InvoiceStatus.PENDING) } returns unpaidInvoices
+            every { fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT) } returns unpaidInvoices
         }
 
         val invoiceService = InvoiceService(dal = dal)
