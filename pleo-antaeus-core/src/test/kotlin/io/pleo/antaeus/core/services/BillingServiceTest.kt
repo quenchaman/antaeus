@@ -8,7 +8,10 @@ import io.pleo.antaeus.core.exceptions.CustomerNotFoundException
 import io.pleo.antaeus.core.exceptions.NetworkException
 import io.pleo.antaeus.core.external.PaymentProvider
 import io.pleo.antaeus.core.services.helpers.InvoiceFactory
-import io.pleo.antaeus.models.*
+import io.pleo.antaeus.models.Currency
+import io.pleo.antaeus.models.Customer
+import io.pleo.antaeus.models.InvoiceStatus
+import io.pleo.antaeus.models.Money
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -295,5 +298,23 @@ class BillingServiceTest {
         billingService.charge(InvoiceFactory.create())
 
         verify(exactly = 1) { invoiceService.changeStatus(any(), InvoiceStatus.CURRENCY_MISMATCH) }
+    }
+
+    @Test
+    fun `will retry on network exception`() {
+        val paymentProvider = mockk<PaymentProvider> {
+            every { charge(any()) } throws NetworkException()
+        }
+        val unpaidInvoices = listOf(
+            Pair(InvoiceFactory.create(), Customer(id = 1, currency = Currency.EUR)),
+            Pair(InvoiceFactory.create(), Customer(id = 1, currency = Currency.EUR))
+        )
+        val invoiceService = mockk<InvoiceService> {
+            every { fetchUnpaid() } returns unpaidInvoices
+        }
+        val billingService = BillingService(paymentProvider, invoiceService, exchangeService)
+
+        billingService.charge()
+        verify(exactly = 3 * unpaidInvoices.size) { paymentProvider.charge(any()) }
     }
 }

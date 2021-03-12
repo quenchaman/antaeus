@@ -5,6 +5,7 @@ import io.pleo.antaeus.core.exceptions.CurrencyMismatchException
 import io.pleo.antaeus.core.exceptions.CustomerNotFoundException
 import io.pleo.antaeus.core.exceptions.NetworkException
 import io.pleo.antaeus.core.external.PaymentProvider
+import io.pleo.antaeus.core.utils.retryIO
 import io.pleo.antaeus.models.Invoice
 import io.pleo.antaeus.models.InvoiceStatus
 
@@ -19,18 +20,17 @@ class BillingService(
 
         return notMismatched.map { it.first } +
                 mismatched.map { exchangeService.exchangeInvoiceAmountToCustomerCurrency(it.first, it.second) }
-
     }
 
     fun charge() = runBlocking {
         prepareInvoicesForPayment()
             .map { invoice ->
                 async(Dispatchers.IO) {
-                    charge(invoice)
+                    retryIO(times = 3) {charge(invoice)}
                 }
             }
-            .mapNotNull { invoiceCall -> invoiceCall.await() }
-            .forEach { invoice -> println(invoice) }
+            .map { invoiceCall -> invoiceCall.await() }
+            .forEach { _ -> }
     }
 
     /*
