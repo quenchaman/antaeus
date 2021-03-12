@@ -1,4 +1,5 @@
 
+import io.pleo.antaeus.core.external.ExchangeProvider
 import io.pleo.antaeus.core.external.PaymentProvider
 import io.pleo.antaeus.data.CustomerDal
 import io.pleo.antaeus.data.InvoiceDal
@@ -36,6 +37,14 @@ internal fun getPaymentProvider(): PaymentProvider {
     return object : PaymentProvider {
         override fun charge(invoice: Invoice): Boolean {
                 return Random.nextBoolean()
+        }
+    }
+}
+
+internal fun getExchangeProvider(): ExchangeProvider {
+    return object : ExchangeProvider {
+        override fun exchange(amount: BigDecimal, currency: Currency, targetCurrency: Currency): BigDecimal {
+            return BigDecimal.TEN
         }
     }
 }

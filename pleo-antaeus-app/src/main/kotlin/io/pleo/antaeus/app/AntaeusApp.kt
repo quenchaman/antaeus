@@ -7,8 +7,8 @@
 
 package io.pleo.antaeus.app
 
+import getExchangeProvider
 import getPaymentProvider
-import io.pleo.antaeus.core.external.ExchangeProviderImpl
 import io.pleo.antaeus.core.services.BillingService
 import io.pleo.antaeus.core.services.CustomerService
 import io.pleo.antaeus.core.services.ExchangeService
@@ -60,7 +60,7 @@ fun main() {
     // Create core services
     val invoiceService = InvoiceService(dal = invoiceDal)
     val customerService = CustomerService(dal = customerDal)
-    val exchangeService = ExchangeService(ExchangeProviderImpl())
+    val exchangeService = ExchangeService(getExchangeProvider())
 
     // This is _your_ billing service to be included where you see fit
     val billingService = BillingService(
