@@ -47,7 +47,7 @@ Install docker for your platform
 
 ```
 docker build -t antaeus .
-docker run antaeus
+./docker-start.sh
 ```
 
 ### App Structure
@@ -90,7 +90,8 @@ Happy hacking 😁!
 I :heart: Kotlin!!! I'd love to get this job! :sob:
 ### Invoice processing feature
 #### Strategic design
-On the first day of each month, charge all unpaid invoices. At the end, all invoices should be charged, except for the cases when the customer does not exist in the payment service. Such cases should be recorded.
+On the first day of each month, charge all unpaid invoices. At the end, all invoices should be charged, except for the cases when the customer does not exist in the payment service or the service is down. Such cases should be recorded.
+Use a service to exchange invoice currency that does not match customer's currency.
 
 #### Tactical design
 * Problem: How we will schedule and run the procedure? 
@@ -112,7 +113,7 @@ On the first day of each month, charge all unpaid invoices. At the end, all invo
 * Alternatives: Do the conversion ourselves ...not a good alternative..:)
 ---
 * Problem: How we handle failed calls with NetworkException to the external API for charging an invoice?
-* Solution: Retry 3 times...This may not be enough to finish our work on the invoices...
+* Solution: Retry 3 times...This may not be enough to finish our work on the invoices...See below.
 ---
 * Problem: What if the Payment service is not available?
 * Solution: We should really use a message queue between us and the payment service to make sure that we have some temporary storage for the invoice charge events if the service is not available.
@@ -125,7 +126,7 @@ Some DBs provide row level locking, so we could definitely improve the performan
 ---
 
 #### Initial Flow diagram
-![sequence diagram](https://github.com/quenchaman/antaeus/blob/master/CustomerPaymentsDesign.svg?raw=true)
+![sequence diagram](https://github.com/quenchaman/antaeus/blob/valeri-hristov/invoice-billing/CustomerPaymentsDesign.svg)
 
 #### My initial plan
 1. Method to fetch invoice by status. DAO-level method.
@@ -139,20 +140,20 @@ Some DBs provide row level locking, so we could definitely improve the performan
 
 #### Good ideas
 - Return immediately from the controller that activates the billing, so that the client can do other useful work
-- Introduce logging.
+- (Done)Introduce logging.
 - Test coverage report.
-- It does not seem like a good design to fetch customer inside exchange service and other services, this should be non-nullable parameter to the methods
+- (Done) It does not seem like a good design to fetch customer inside exchange service and other services, this should be non-nullable parameter to the methods
 
-#### What I will not do and why
-What: Test DAL level methods
-Why: There should not be any business logic in a DAL method, so nothing to unit test. The connection to database will be tested during integration tests via other services that call the DAL.
+#### What I will not do and justification
+* What: Test DAL level methods
+* Why: There should not be any business logic in a DAL method, so nothing to unit test. The connection to database will be tested during integration tests via other services that call the DAL.
 ---
-What: I will not use JOINs between Invoice and Customer and change the customerId to customer in Invoice.
-Why: With in memory DB I will just map the customers to invoices where needed, no memory overhead, but surely performance will suffer. If I go the route of changing Invoice model I will break the contract with PaymentProvider and it has to rebuild and redeploy. I can invent a new invoice class used just for carrying the Customer for the currency check, but for simplicity I will not.
+* What: I will not use JOINs between Invoice and Customer and change the customerId to customer in Invoice.
+* Why: With in memory DB I will just map the customers to invoices where needed, no memory overhead, but surely performance will suffer. If I go the route of changing Invoice model I will break the contract with PaymentProvider and it has to rebuild and redeploy. I can invent a new invoice class used just for carrying the Customer for the currency check, but for simplicity I will not.
 
 #### I won't have time for...
 - ExchangeProvider will make network requests to convert currency and there many things can go wrong, but I will cover only the happy path.
-- Having separate database for testing is a good practice. I will just cleanup the current one when testing.
+- Having separate database for testing is a good practice. I will just mock the current one when testing.
 - Creating a Dal abstraction for the common operations on a table.
 - Create a REST endpoint on which the client can check the status of the billing.
 - Handle case when customer is null for an invoice.

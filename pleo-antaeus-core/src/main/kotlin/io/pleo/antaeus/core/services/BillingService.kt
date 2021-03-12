@@ -19,6 +19,7 @@ class BillingService(
 ) {
     fun prepareInvoicesForPayment(): List<Invoice> {
         logger.info("Preparing invoices for payment...")
+
         val (mismatched, matching) = invoiceService.fetchUnpaid()
             .partition { exchangeService.checkCurrencyMismatch(it.first, it.second) }
 

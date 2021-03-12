@@ -66,4 +66,10 @@ class InvoiceDal(private val db: Database) {
 
         return fetchInvoice(id)
     }
+
+    fun clearInvoices() {
+        transaction(db) {
+            InvoiceTable.deleteAll()
+        }
+    }
 }

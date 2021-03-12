@@ -1,9 +1,10 @@
-package io.pleo.antaeus.core.services
+package io.pleo.antaeus.core.services.unit
 
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.pleo.antaeus.core.external.ExchangeProvider
+import io.pleo.antaeus.core.services.ExchangeService
 import io.pleo.antaeus.core.services.helpers.InvoiceFactory
 import io.pleo.antaeus.models.Currency
 import io.pleo.antaeus.models.Customer
