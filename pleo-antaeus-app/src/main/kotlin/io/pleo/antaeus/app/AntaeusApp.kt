@@ -13,9 +13,7 @@ import io.pleo.antaeus.core.services.BillingService
 import io.pleo.antaeus.core.services.CustomerService
 import io.pleo.antaeus.core.services.ExchangeService
 import io.pleo.antaeus.core.services.InvoiceService
-import io.pleo.antaeus.data.AntaeusDal
-import io.pleo.antaeus.data.CustomerTable
-import io.pleo.antaeus.data.InvoiceTable
+import io.pleo.antaeus.data.*
 import io.pleo.antaeus.rest.AntaeusRest
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -50,17 +48,18 @@ fun main() {
         }
 
     // Set up data access layer.
-    val dal = AntaeusDal(db = db)
+    val invoiceDal = InvoiceDal(db = db)
+    val customerDal = CustomerDal(db = db)
 
     // Insert example data in the database.
-    setupInitialData(dal = dal)
+    setupInitialData(invoiceDal = invoiceDal, customerDal = customerDal)
 
     // Get third parties
     val paymentProvider = getPaymentProvider()
 
     // Create core services
-    val invoiceService = InvoiceService(dal = dal)
-    val customerService = CustomerService(dal = dal)
+    val invoiceService = InvoiceService(dal = invoiceDal)
+    val customerService = CustomerService(dal = customerDal)
     val exchangeService = ExchangeService(ExchangeProviderImpl())
 
     // This is _your_ billing service to be included where you see fit

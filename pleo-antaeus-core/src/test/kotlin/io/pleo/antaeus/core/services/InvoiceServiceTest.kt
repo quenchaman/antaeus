@@ -5,7 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.pleo.antaeus.core.exceptions.InvoiceNotFoundException
 import io.pleo.antaeus.core.services.helpers.InvoiceFactory
-import io.pleo.antaeus.data.AntaeusDal
+import io.pleo.antaeus.data.InvoiceDal
 import io.pleo.antaeus.models.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -25,7 +25,7 @@ class InvoiceServiceTest {
 
     @Test
     fun `will throw if invoice is not found`() {
-        val dal = mockk<AntaeusDal> {
+        val dal = mockk<InvoiceDal> {
             every { fetchInvoice(404) } returns null
         }
 
@@ -38,7 +38,7 @@ class InvoiceServiceTest {
 
     @Test
     fun `will return unpaid invoices with customer`() {
-        val dal = mockk<AntaeusDal> {
+        val dal = mockk<InvoiceDal> {
             every {
                 fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
             } returns unpaidInvoices
@@ -57,7 +57,7 @@ class InvoiceServiceTest {
 
     @Test
     fun `will return only unpaid invoices`() {
-        val dal = mockk<AntaeusDal> {
+        val dal = mockk<InvoiceDal> {
             every {
                 fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
             } returns unpaidInvoices
@@ -70,7 +70,7 @@ class InvoiceServiceTest {
 
     @Test
     fun `will return an empty list when there are no invoices in the db`() {
-        val dal = mockk<AntaeusDal> {
+        val dal = mockk<InvoiceDal> {
             every {
                 fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
             } returns emptyList()
@@ -95,7 +95,7 @@ class InvoiceServiceTest {
             Pair(invoice3, customer3)
         )
 
-        val dal = mockk<AntaeusDal> {
+        val dal = mockk<InvoiceDal> {
             every { fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT) } returns unpaidInvoices
         }
 
@@ -110,7 +110,7 @@ class InvoiceServiceTest {
 
     @Test
     fun `will have method to update invoice status and it calls dal`() {
-        val dal = mockk<AntaeusDal> {
+        val dal = mockk<InvoiceDal> {
             every { updateInvoiceStatus(any(), any()) } returns InvoiceFactory.create()
         }
         val invoiceService = InvoiceService(dal = dal)
