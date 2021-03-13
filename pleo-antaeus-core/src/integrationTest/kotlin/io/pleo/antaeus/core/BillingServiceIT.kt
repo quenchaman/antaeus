@@ -1,16 +1,13 @@
-package io.pleo.antaeus.core.services.integration
+package io.pleo.antaeus.core
 
-import io.mockk.every
-import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
-import io.pleo.antaeus.core.external.PaymentProvider
 import io.pleo.antaeus.core.services.BillingService
 import io.pleo.antaeus.core.services.ExchangeService
 import io.pleo.antaeus.core.services.InvoiceService
-import io.pleo.antaeus.core.services.helpers.InvoiceFactory
 import io.pleo.antaeus.core.external.getExchangeProvider
-import io.pleo.antaeus.core.services.helpers.getTestPaymentProvider
+import io.pleo.antaeus.core.utils.InvoiceFactory
+import io.pleo.antaeus.core.utils.getTestPaymentProvider
 import io.pleo.antaeus.data.*
 import io.pleo.antaeus.models.Currency
 import io.pleo.antaeus.models.Customer

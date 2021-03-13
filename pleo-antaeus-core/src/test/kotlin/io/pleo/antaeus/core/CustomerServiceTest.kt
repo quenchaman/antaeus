@@ -1,4 +1,4 @@
-package io.pleo.antaeus.core.services.unit
+package io.pleo.antaeus.core
 
 import io.mockk.every
 import io.mockk.mockk

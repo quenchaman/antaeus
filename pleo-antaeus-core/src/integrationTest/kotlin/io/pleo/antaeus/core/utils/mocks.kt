@@ -1,4 +1,4 @@
-package io.pleo.antaeus.core.services.helpers
+package io.pleo.antaeus.core.utils
 
 import io.pleo.antaeus.core.exceptions.CustomerNotFoundException
 import io.pleo.antaeus.core.external.PaymentProvider

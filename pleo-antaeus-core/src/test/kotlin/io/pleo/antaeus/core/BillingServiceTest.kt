@@ -1,4 +1,4 @@
-package io.pleo.antaeus.core.services.unit
+package io.pleo.antaeus.core
 
 import io.mockk.every
 import io.mockk.mockk
@@ -10,7 +10,7 @@ import io.pleo.antaeus.core.external.PaymentProvider
 import io.pleo.antaeus.core.services.BillingService
 import io.pleo.antaeus.core.services.ExchangeService
 import io.pleo.antaeus.core.services.InvoiceService
-import io.pleo.antaeus.core.services.helpers.InvoiceFactory
+import io.pleo.antaeus.core.utils.InvoiceFactory
 import io.pleo.antaeus.models.Currency
 import io.pleo.antaeus.models.Customer
 import io.pleo.antaeus.models.InvoiceStatus

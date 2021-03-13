@@ -46,7 +46,6 @@ If you use homebrew on MacOS `brew install sqlite`.
 Install docker for your platform
 
 ```
-docker build -t antaeus .
 ./docker-start.sh
 ```
 
@@ -168,6 +167,22 @@ I moved the joining of Invoices and Customer to the data-access layer and I am h
 #### 12.03.2021
 Implemented synchronous calls to ExchangeProvider::charge method, but I do not handle retries...I will attempt to make the calls in parallel and handle retries too.
 
+#### 13.03.2021
+What else?
+1. E2E tests
+2. DSL
+3. Abstract DAL class
+4. Test DB in container
+5. Multi-layer docker build
+6. Configuration file
+7. ~~Gradle task for integration and e2e tests~~
+
+I copy-pasted the gradle configuration for extracting the integration tests in their own source dir.
+Gradle is obfuscated as it is and using it via kotlin script makes it even "better" :D Integration test does not compile now because it cannot find references...
+Woo-hoo! It behaves!!! Now I will create a separate source and task for e2e tests. They will be run against a running service URL which we provide.
+This commit will be quite huge :D I do not do such commits in my professional practice, but sometimes it happens. I will go ahead just because I am working alone on this :) Forgive me.
+Woo-hoo!! E2E tests are up and running! Man, what is going on today...usually nothing works...
+Now I have three nice tasks in the Gradle drawer - test, integrationTest and e2eTest...This makes me gitty
 ```diff
 - Design changed quite a bit during development, so it is better to look at the code, because Docs quickly get outdated.
 ```
