@@ -13,12 +13,13 @@ import io.pleo.antaeus.models.Currency
 import io.pleo.antaeus.models.Customer
 import io.pleo.antaeus.models.InvoiceStatus
 import io.pleo.antaeus.models.Money
+import org.jetbrains.exposed.sql.Table
 import org.junit.jupiter.api.*
 import java.math.BigDecimal
 
 class BillingServiceIT {
 
-    private val tables = arrayOf(InvoiceTable, CustomerTable)
+    private val tables = arrayOf(InvoiceTable as Table, CustomerTable as Table)
     private val testDb = DBConnection.connect("antaeus-test-db", tables)
     private val invoiceDal = InvoiceDal(testDb)
     private val customerDal = CustomerDal(testDb)
@@ -39,7 +40,7 @@ class BillingServiceIT {
 
     @BeforeEach
     fun init() {
-        invoiceDal.clearInvoices()
+        invoiceDal.deleteInvoices()
         customerDal.clearCustomers()
 
         customerDal.createCustomer(currency = customer1.currency)
@@ -52,7 +53,7 @@ class BillingServiceIT {
 
     @AfterEach
     fun cleanUp() {
-        invoiceDal.clearInvoices()
+        invoiceDal.deleteInvoices()
         customerDal.clearCustomers()
     }
 

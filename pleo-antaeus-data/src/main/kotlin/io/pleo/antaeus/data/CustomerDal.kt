@@ -5,22 +5,17 @@ import io.pleo.antaeus.models.Customer
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class CustomerDal(private val db: Database) {
+class CustomerDal(private val db: Database) : BaseDal() {
 
     fun fetchCustomer(id: Int): Customer? {
         return transaction(db) {
-            CustomerTable
-                .select { CustomerTable.id.eq(id) }
-                .firstOrNull()
-                ?.toCustomer()
+            fetchById(CustomerTable, id)?.toCustomer()
         }
     }
 
     fun fetchCustomers(): List<Customer> {
-        return transaction(db) {
-            CustomerTable
-                .selectAll()
-                .map { it.toCustomer() }
+        return transaction {
+            fetchAll(CustomerTable).map { it.toCustomer() }
         }
     }
 
@@ -37,7 +32,7 @@ class CustomerDal(private val db: Database) {
 
     fun clearCustomers() {
         transaction(db) {
-            CustomerTable.deleteAll()
+            deleteAll(CustomerTable)
         }
     }
 }

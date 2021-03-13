@@ -15,10 +15,11 @@ import io.pleo.antaeus.core.external.getExchangeProvider
 import io.pleo.antaeus.core.external.getPaymentProvider
 import io.pleo.antaeus.data.*
 import io.pleo.antaeus.rest.AntaeusRest
+import org.jetbrains.exposed.sql.Table
 
 fun main() {
     // The tables to create in the database.
-    val tables = arrayOf(InvoiceTable, CustomerTable)
+    val tables = arrayOf(InvoiceTable as Table, CustomerTable as Table)
     val db = DBConnection.connect("antaeus-db", tables)
 
     // Set up data access layer.

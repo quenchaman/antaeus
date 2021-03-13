@@ -7,23 +7,17 @@ import io.pleo.antaeus.models.Money
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class InvoiceDal(private val db: Database) {
+class InvoiceDal(private val db: Database) : BaseDal() {
+
     fun fetchInvoice(id: Int): Invoice? {
-        // transaction(db) runs the internal query as a new database transaction.
         return transaction(db) {
-            // Returns the first invoice with matching id.
-            InvoiceTable
-                .select { InvoiceTable.id.eq(id) }
-                .firstOrNull()
-                ?.toInvoice()
+            fetchById(InvoiceTable, id)?.toInvoice()
         }
     }
 
     fun fetchInvoices(): List<Invoice> {
         return transaction(db) {
-            InvoiceTable
-                .selectAll()
-                .map { it.toInvoice() }
+            fetchAll(InvoiceTable).map { it.toInvoice() }
         }
     }
 
@@ -67,9 +61,9 @@ class InvoiceDal(private val db: Database) {
         return fetchInvoice(id)
     }
 
-    fun clearInvoices() {
+    fun deleteInvoices() {
         transaction(db) {
-            InvoiceTable.deleteAll()
+            deleteAll(InvoiceTable)
         }
     }
 }

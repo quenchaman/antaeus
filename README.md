@@ -208,6 +208,10 @@ In Spring configuring the environments is a breeze, but with this brick and mort
 
 I keep saying something is not easy...such a baby... :baby:
 
+A benefit of using Docker that I realised just now - Stopping the app is Blazingly fast!!! When you run it on your PC it takes time for the JVM to cleanup and do some other black magic I have no clue of, but when you run it in container you just throw it away..no need to care about the OS's state.
+
+Made refactoring of the DAL. Can't say that I am pleased with the results - I wanted to abtract the transaction thing, but I did not know what it does and I cannot put it in the base DAL class. At least I learned about generics and casting in Kotlin! :boom:
+
 ```diff
 - Design changed quite a bit during development, so it is better to look at the code, because Docs quickly get outdated.
 ```
