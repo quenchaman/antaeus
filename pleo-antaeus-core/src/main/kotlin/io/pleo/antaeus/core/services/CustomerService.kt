@@ -10,10 +10,10 @@ import io.pleo.antaeus.models.Customer
 
 class CustomerService(private val dal: CustomerDal) {
     fun fetchAll(): List<Customer> {
-        return dal.fetchCustomers()
+        return dal.fetchAll()
     }
 
     fun fetch(id: Int): Customer {
-        return dal.fetchCustomer(id) ?: throw CustomerNotFoundException(id)
+        return dal.fetch(id) ?: throw CustomerNotFoundException(id)
     }
 }

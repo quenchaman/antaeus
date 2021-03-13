@@ -27,7 +27,7 @@ class InvoiceServiceTest {
     @Test
     fun `will throw if invoice is not found`() {
         val dal = mockk<InvoiceDal> {
-            every { fetchInvoice(404) } returns null
+            every { fetch(404) } returns null
         }
 
         val invoiceService = InvoiceService(dal = dal)
@@ -41,13 +41,13 @@ class InvoiceServiceTest {
     fun `will return unpaid invoices with customer`() {
         val dal = mockk<InvoiceDal> {
             every {
-                fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
+                fetchByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
             } returns unpaidInvoices
         }
         val invoiceService = InvoiceService(dal = dal)
         val invoices: List<Pair<Invoice, Customer>> = invoiceService.fetchUnpaid()
 
-        verify(exactly = 1) { dal.fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT) }
+        verify(exactly = 1) { dal.fetchByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT) }
         Assertions.assertTrue(invoices.isNotEmpty())
         Assertions.assertEquals(unpaidInvoices.size, invoices.size)
 
@@ -60,7 +60,7 @@ class InvoiceServiceTest {
     fun `will return only unpaid invoices`() {
         val dal = mockk<InvoiceDal> {
             every {
-                fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
+                fetchByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
             } returns unpaidInvoices
         }
         val invoiceService = InvoiceService(dal = dal)
@@ -73,7 +73,7 @@ class InvoiceServiceTest {
     fun `will return an empty list when there are no invoices in the db`() {
         val dal = mockk<InvoiceDal> {
             every {
-                fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
+                fetchByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
             } returns emptyList()
         }
 
@@ -97,7 +97,7 @@ class InvoiceServiceTest {
         )
 
         val dal = mockk<InvoiceDal> {
-            every { fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT) } returns unpaidInvoices
+            every { fetchByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT) } returns unpaidInvoices
         }
 
         val invoiceService = InvoiceService(dal = dal)
@@ -112,11 +112,11 @@ class InvoiceServiceTest {
     @Test
     fun `will have method to update invoice status and it calls dal`() {
         val dal = mockk<InvoiceDal> {
-            every { updateInvoiceStatus(any(), any()) } returns InvoiceFactory.create()
+            every { updateStatus(any(), any()) } returns InvoiceFactory.create()
         }
         val invoiceService = InvoiceService(dal = dal)
 
         invoiceService.changeStatus(1, InvoiceStatus.PAID)
-        verify(exactly = 1) { dal.updateInvoiceStatus(any(), any()) }
+        verify(exactly = 1) { dal.updateStatus(any(), any()) }
     }
 }

@@ -31,12 +31,12 @@ class BillingService(
 
     fun charge() = runBlocking {
         prepareInvoicesForPayment()
-            .map { invoice ->
+            .map {
                 async(Dispatchers.IO) {
-                    retryIO(times = 3) { charge(invoice) }
+                    retryIO(times = 3) { charge(it) }
                 }
             }
-            .map { invoiceCall -> invoiceCall.await() }
+            .map { it.await() }
             .forEach { _ -> }
     }
 

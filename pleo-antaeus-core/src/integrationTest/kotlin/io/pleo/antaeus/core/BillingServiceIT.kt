@@ -40,12 +40,12 @@ class BillingServiceIT {
 
     @BeforeEach
     fun init() {
-        invoiceDal.deleteInvoices()
-        customerDal.clearCustomers()
+        invoiceDal.delete()
+        customerDal.delete()
 
-        customerDal.createCustomer(currency = customer1.currency)
+        customerDal.create(currency = customer1.currency)
 
-        (1..10).forEach { number -> invoiceDal.createInvoice(
+        (1..10).forEach { number -> invoiceDal.create(
             amount = Money(value = BigDecimal(number), currency = customer1.currency),
             customer = customer1
         )}
@@ -53,20 +53,20 @@ class BillingServiceIT {
 
     @AfterEach
     fun cleanUp() {
-        invoiceDal.deleteInvoices()
-        customerDal.clearCustomers()
+        invoiceDal.delete()
+        customerDal.delete()
     }
 
     @Test
     fun `will charge all unpaid invoices`() {
-        val unpaidInvoices = invoiceDal.fetchInvoices()
+        val unpaidInvoices = invoiceDal.fetchAll()
             .filter { it.status == InvoiceStatus.PENDING }
         val unpaidInvoicesCount = unpaidInvoices.size
 
         billingService.charge()
         verify(exactly = unpaidInvoicesCount) { billingService.charge(any()) }
         verify(exactly = unpaidInvoicesCount) { paymentProvider.charge(any()) }
-        val allInvoices = invoiceDal.fetchInvoices()
+        val allInvoices = invoiceDal.fetchAll()
 
         Assertions.assertEquals(
             allInvoices.size,
@@ -76,17 +76,17 @@ class BillingServiceIT {
 
     @Test
     fun `will exchange and charge non-matching invoices`() {
-        invoiceDal.createInvoice(amount = unpaidMismatchInvoice1.amount, customer = customer1, status = InvoiceStatus.PENDING)
-        invoiceDal.createInvoice(amount = unpaidMismatchInvoice2.amount, customer = customer1, status = InvoiceStatus.PENDING)
+        invoiceDal.create(amount = unpaidMismatchInvoice1.amount, customer = customer1, status = InvoiceStatus.PENDING)
+        invoiceDal.create(amount = unpaidMismatchInvoice2.amount, customer = customer1, status = InvoiceStatus.PENDING)
 
-        val unpaidInvoices = invoiceDal.fetchInvoices()
+        val unpaidInvoices = invoiceDal.fetchAll()
             .filter { it.status == InvoiceStatus.PENDING }
         val unpaidInvoicesCount = unpaidInvoices.size
 
         billingService.charge()
         verify(exactly = unpaidInvoicesCount) { billingService.charge(any()) }
         verify(exactly = 2) { exchangeService.exchange(any(), any(), any()) }
-        val allInvoices = invoiceDal.fetchInvoices()
+        val allInvoices = invoiceDal.fetchAll()
 
         Assertions.assertEquals(
             allInvoices.size,
@@ -96,8 +96,8 @@ class BillingServiceIT {
 
     @Test
     fun `will handle missing customer exception and charge all other invoices`() {
-        val customer2 = customerDal.createCustomer(Currency.EUR)
-        val invoice = invoiceDal.createInvoice(
+        val customer2 = customerDal.create(Currency.EUR)
+        val invoice = invoiceDal.create(
             amount = unpaidMismatchInvoice1.amount,
             customer = customer2 ?: customer1,
             status = InvoiceStatus.PENDING
@@ -105,8 +105,8 @@ class BillingServiceIT {
 
         billingService.charge()
 
-        Assertions.assertEquals(InvoiceStatus.CUSTOMER_NOT_FOUND, invoiceDal.fetchInvoice(invoice.id)?.status)
-        val allInvoices = invoiceDal.fetchInvoices()
+        Assertions.assertEquals(InvoiceStatus.CUSTOMER_NOT_FOUND, invoiceDal.fetch(invoice.id)?.status)
+        val allInvoices = invoiceDal.fetchAll()
         Assertions.assertEquals(allInvoices.size - 1, // without the customer not found one
             allInvoices.filter { it.status == InvoiceStatus.PAID }.size
         )

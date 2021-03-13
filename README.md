@@ -177,7 +177,7 @@ Implemented synchronous calls to ExchangeProvider::charge method, but I do not h
 What else?
 1. ~~E2E tests~~
 2. DSL
-3. Abstract DAL class
+3. ~~Abstract DAL class~~
 4. Test DB in container
 5. Multi-layer docker build
 6. ~~Configuration file~~ (Kinda...)

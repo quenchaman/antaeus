@@ -7,19 +7,16 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class CustomerDal(private val db: Database) : BaseDal() {
 
-    fun fetchCustomer(id: Int): Customer? {
-        return transaction(db) {
-            fetchById(CustomerTable, id)?.toCustomer()
-        }
+    fun fetch(id: Int): Customer? = transaction(db) {
+        fetchById(CustomerTable, id)?.toCustomer()
     }
 
-    fun fetchCustomers(): List<Customer> {
-        return transaction {
-            fetchAll(CustomerTable).map { it.toCustomer() }
-        }
+    fun fetchAll(): List<Customer> = transaction {
+        fetchAll(CustomerTable).map { it.toCustomer() }
     }
 
-    fun createCustomer(currency: Currency): Customer? {
+
+    fun create(currency: Currency): Customer? {
         val id = transaction(db) {
             // Insert the customer and return its new id.
             CustomerTable.insert {
@@ -27,12 +24,10 @@ class CustomerDal(private val db: Database) : BaseDal() {
             } get CustomerTable.id
         }
 
-        return fetchCustomer(id)
+        return fetch(id)
     }
 
-    fun clearCustomers() {
-        transaction(db) {
-            deleteAll(CustomerTable)
-        }
+    fun delete() = transaction(db) {
+        deleteAll(CustomerTable)
     }
 }

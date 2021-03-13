@@ -12,18 +12,18 @@ import io.pleo.antaeus.models.InvoiceStatus
 
 class InvoiceService(private val dal: InvoiceDal) {
     fun fetchAll(): List<Invoice> {
-        return dal.fetchInvoices()
+        return dal.fetchAll()
     }
 
     fun fetch(id: Int): Invoice {
-        return dal.fetchInvoice(id) ?: throw InvoiceNotFoundException(id)
+        return dal.fetch(id) ?: throw InvoiceNotFoundException(id)
     }
 
     fun fetchUnpaid(): List<Pair<Invoice, Customer>> {
-        return dal.fetchInvoicesByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
+        return dal.fetchByStatusAndUpdate(InvoiceStatus.PENDING, InvoiceStatus.SENT_FOR_PAYMENT)
     }
 
     fun changeStatus(id: Int, status: InvoiceStatus): Invoice? {
-        return dal.updateInvoiceStatus(id, status)
+        return dal.updateStatus(id, status)
     }
 }

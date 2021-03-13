@@ -9,19 +9,15 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class InvoiceDal(private val db: Database) : BaseDal() {
 
-    fun fetchInvoice(id: Int): Invoice? {
-        return transaction(db) {
-            fetchById(InvoiceTable, id)?.toInvoice()
-        }
+    fun fetch(id: Int): Invoice? = transaction(db) {
+        fetchById(InvoiceTable, id)?.toInvoice()
     }
 
-    fun fetchInvoices(): List<Invoice> {
-        return transaction(db) {
-            fetchAll(InvoiceTable).map { it.toInvoice() }
-        }
+    fun fetchAll(): List<Invoice> = transaction(db) {
+        fetchAll(InvoiceTable).map { it.toInvoice() }
     }
 
-    fun fetchInvoicesByStatusAndUpdate(queryStatus: InvoiceStatus, updateStatus: InvoiceStatus):
+    fun fetchByStatusAndUpdate(queryStatus: InvoiceStatus, updateStatus: InvoiceStatus):
             List<Pair<Invoice, Customer>> {
         return transaction(db) {
             val invoices = (InvoiceTable innerJoin CustomerTable)
@@ -29,13 +25,13 @@ class InvoiceDal(private val db: Database) : BaseDal() {
                 .map { Pair(it.toInvoice(), it.toCustomer()) }
 
             // TODO: Update all invoices in one go
-            invoices.forEach { invoicePair -> updateInvoiceStatus(invoicePair.first.id, updateStatus) }
+            invoices.forEach { invoicePair -> updateStatus(invoicePair.first.id, updateStatus) }
 
             invoices
         }
     }
 
-    fun createInvoice(amount: Money, customer: Customer, status: InvoiceStatus = InvoiceStatus.PENDING): Invoice? {
+    fun create(amount: Money, customer: Customer, status: InvoiceStatus = InvoiceStatus.PENDING): Invoice? {
         val id = transaction(db) {
             // Insert the invoice and returns its new id.
             InvoiceTable
@@ -47,10 +43,10 @@ class InvoiceDal(private val db: Database) : BaseDal() {
                 } get InvoiceTable.id
         }
 
-        return fetchInvoice(id)
+        return fetch(id)
     }
 
-    fun updateInvoiceStatus(id: Int, status: InvoiceStatus): Invoice? {
+    fun updateStatus(id: Int, status: InvoiceStatus): Invoice? {
         transaction(db) {
             InvoiceTable
                 .update({ InvoiceTable.id.eq(id) }) {
@@ -58,12 +54,10 @@ class InvoiceDal(private val db: Database) : BaseDal() {
                 }
         }
 
-        return fetchInvoice(id)
+        return fetch(id)
     }
 
-    fun deleteInvoices() {
-        transaction(db) {
-            deleteAll(InvoiceTable)
-        }
+    fun delete() = transaction(db) {
+        deleteAll(InvoiceTable)
     }
 }
