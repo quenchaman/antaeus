@@ -17,8 +17,7 @@ class InvoiceDal(private val db: Database) : BaseDal() {
         fetchAll(InvoiceTable).map { it.toInvoice() }
     }
 
-    fun fetchByStatusAndUpdate(queryStatus: InvoiceStatus, updateStatus: InvoiceStatus):
-            List<Pair<Invoice, Customer>> {
+    fun fetchByStatusAndUpdate(queryStatus: InvoiceStatus, updateStatus: InvoiceStatus): List<Pair<Invoice, Customer>> {
         return transaction(db) {
             val invoices = (InvoiceTable innerJoin CustomerTable)
                 .select { InvoiceTable.status.eq(queryStatus.name) }

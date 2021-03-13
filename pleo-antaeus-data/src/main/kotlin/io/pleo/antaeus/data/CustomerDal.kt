@@ -15,7 +15,6 @@ class CustomerDal(private val db: Database) : BaseDal() {
         fetchAll(CustomerTable).map { it.toCustomer() }
     }
 
-
     fun create(currency: Currency): Customer? {
         val id = transaction(db) {
             // Insert the customer and return its new id.

@@ -20,7 +20,7 @@ interface Api {
 
     companion object {
         fun create(): Api {
-            val baseUrl: String = System.getProperty("apiUrl") ?: "system property apiUrl not set"
+            val baseUrl: String = System.getProperty("apiUrl")
             val retrofit = Retrofit.Builder()
                 // here we set the base url of our API
                 .baseUrl(baseUrl)

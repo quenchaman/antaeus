@@ -23,23 +23,24 @@ class AntaeusRest(
 ) : Runnable {
 
     override fun run() {
-        app.start(7000)
+        app.start((System.getProperty("appPort") ?: "7000").toInt())
     }
 
     // Set up Javalin rest app
     private val app = Javalin
         .create()
         .apply {
-            // InvoiceNotFoundException: return 404 HTTP status code
             exception(EntityNotFoundException::class.java) { _, ctx ->
                 ctx.status(404)
             }
-            // Unexpected exception: return HTTP 500
-            exception(Exception::class.java) { e, _ ->
-                logger.error(e) { "Internal server error" }
+
+            exception(Exception::class.java) { e, ctx ->
+                logger.error(e) { "Internal server error: " + e.printStackTrace() }
+                ctx.status(500)
             }
-            // On 404: return message
+
             error(404) { ctx -> ctx.json("not found") }
+            error(500) { ctx -> ctx.json("internal server error")}
         }
 
     init {
@@ -49,13 +50,10 @@ class AntaeusRest(
                 it.result("Welcome to Antaeus! see AntaeusRest class for routes")
             }
             path("rest") {
-                // Route to check whether the app is running
-                // URL: /rest/health
                 get("health") {
                     it.json("ok")
                 }
 
-                // V1
                 path("v1") {
                     path("invoices") {
                         // URL: /rest/v1/invoices

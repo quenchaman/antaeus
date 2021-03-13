@@ -93,7 +93,7 @@ I :heart: Kotlin!!! I'd love to get this job! :sob:
 ### Invoice processing feature
 #### Strategic design
 On the first day of each month, charge all unpaid invoices. At the end, all invoices should be charged, except for the cases when the customer does not exist in the payment service or the service is down. Such cases should be recorded.
-Use a service to exchange invoice currency that does not match customer's currency.
+Use a service to exchange invoice currency that does not match customer's currency. :point_down:
 
 #### Tactical design
 * Problem: How we will schedule and run the procedure? 
@@ -176,7 +176,7 @@ Implemented synchronous calls to ExchangeProvider::charge method, but I do not h
 #### 13.03.2021
 What else?
 1. ~~E2E tests~~
-2. DSL
+2. ~~DSL~~ not much opportunities here, maybe some other time...
 3. ~~Abstract DAL class~~
 4. Test DB in container
 5. Multi-layer docker build

@@ -51,5 +51,5 @@ task<Test>("e2eTest") {
     classpath = sourceSets["e2eTest"].runtimeClasspath
     useJUnitPlatform()
 
-    systemProperty("apiUrl", "http://localhost:7000")
+    systemProperty("apiUrl", System.getProperty("apiUrl") ?: "http://localhost:7000")
 }
