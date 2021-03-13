@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test
 class Health {
     @Test
     fun `will call endpoint to fetch health status`() {
-        val api = Api.create("http://localhost:7000")
+        val api = Api.create()
         val response = api.checkHealth().execute()
 
-        Assertions.assertEquals(200, response.code())
+        Assertions.assertTrue(response.isSuccessful)
     }
 }

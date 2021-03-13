@@ -50,4 +50,6 @@ task<Test>("e2eTest") {
     testClassesDirs = sourceSets["e2eTest"].output.classesDirs
     classpath = sourceSets["e2eTest"].runtimeClasspath
     useJUnitPlatform()
+
+    systemProperty("apiUrl", "http://localhost:7000")
 }

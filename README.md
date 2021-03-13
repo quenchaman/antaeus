@@ -86,6 +86,9 @@ The code given is structured as follows. Feel free however to modify the structu
 
 Happy hacking 😁!
 
+![peter griffin's turn to sing](https://thumbs.gfycat.com/CreepyCrispAntbear-max-1mb.gif)
+## Valeri's part now :information_desk_person:
+
 I :heart: Kotlin!!! I'd love to get this job! :sob:
 ### Invoice processing feature
 #### Strategic design
@@ -121,6 +124,9 @@ Use a service to exchange invoice currency that does not match customer's curren
 * Solution: After fetching the unpaid invoices we can mark them as 'sent for processing' in a transaction with the fetching itself. That way, the next transaction would find the DB in a state where the invoices are not 'pending'(not paid)
 Of course, the DB becomes a huge bottleneck, but in the fintech world it is better to be safe than sorry :)
 Some DBs provide row level locking, so we could definitely improve the performance.
+---
+* Problem: Should we fire-and-forget the REST call to charge invoices or wait it out?
+* Answer: From the perspective of the client of our service, it is better to return immediately and then give another endpoint to poll for the status of the charged invoices or just use GET /invoices for all of them and do some filtering.
 ---
 ---
 
@@ -169,20 +175,39 @@ Implemented synchronous calls to ExchangeProvider::charge method, but I do not h
 
 #### 13.03.2021
 What else?
-1. E2E tests
+1. ~~E2E tests~~
 2. DSL
 3. Abstract DAL class
 4. Test DB in container
 5. Multi-layer docker build
-6. Configuration file
+6. ~~Configuration file~~ (Kinda...)
 7. ~~Gradle task for integration and e2e tests~~
 
 I copy-pasted the gradle configuration for extracting the integration tests in their own source dir.
 Gradle is obfuscated as it is and using it via kotlin script makes it even "better" :D Integration test does not compile now because it cannot find references...
+
 Woo-hoo! It behaves!!! Now I will create a separate source and task for e2e tests. They will be run against a running service URL which we provide.
+
 This commit will be quite huge :D I do not do such commits in my professional practice, but sometimes it happens. I will go ahead just because I am working alone on this :) Forgive me.
+
 Woo-hoo!! E2E tests are up and running! Man, what is going on today...usually nothing works...
+
 Now I have three nice tasks in the Gradle drawer - test, integrationTest and e2eTest...This makes me gitty
+
+Running the e2e tests I am like...
+![yeah](https://i.kym-cdn.com/photos/images/newsfeed/000/649/315/8a1.gif)
+Now I am doing some TDD endpoint development using Retrofit...this library is genius!
+
+Hmm.. there are a lot of endpoints that can be tested, but I am not trying to be exhaustive here, but to showcase the best practices and techniques that I know.
+
+It might seam that in some areas I overdid it, but I just got carried away coding in Kotlin! If I put enough time and the project is used a bit it would improve, but now it is just a good starting point.
+
+Configuring the different environments is not an easy task...It would be good to have a configurable app, for example, when passing a different property when launching the application we can change the DB which the app uses or the JVM settings.
+
+In Spring configuring the environments is a breeze, but with this brick and mortar setup it is not easy...
+
+I keep saying something is not easy...such a baby... :baby:
+
 ```diff
 - Design changed quite a bit during development, so it is better to look at the code, because Docs quickly get outdated.
 ```
