@@ -23,7 +23,7 @@ class AntaeusRest(
 ) : Runnable {
 
     override fun run() {
-        app.start((System.getProperty("appPort") ?: "7000").toInt())
+        app.start((System.getenv("port") ?: "3000").toInt())
     }
 
     // Set up Javalin rest app

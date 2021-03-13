@@ -17,3 +17,9 @@ dependencies {
     implementation(project(":pleo-antaeus-core"))
     implementation(project(":pleo-antaeus-models"))
 }
+
+tasks {
+    "run"(JavaExec::class) {
+        environment("port", System.getProperty("port") ?: "7000")
+    }
+}
