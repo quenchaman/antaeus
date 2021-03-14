@@ -212,6 +212,35 @@ A benefit of using Docker that I realised just now - Stopping the app is Blazing
 
 Made refactoring of the DAL. Can't say that I am pleased with the results - I wanted to abtract the transaction thing, but I did not know what it does and I cannot put it in the base DAL class. At least I learned about generics and casting in Kotlin! :boom:
 
+#### 14.03.2021
+I woke up with the idea to code authentication in this app.
+
+The easiest option would be something like basic auth or JWT or session based, but I assume that this service will be a part of a mesh of microservices that works together in a kubernetis cluster or AWS VPC, so it does not make sense for every client of the service to register in it...If I have to implement login it has to be OAuth based.
+
+By using OAuth protocol, we will have one account for each service that is authorised to work with our service. When this service wants to call us, it would send, for example, LDAP credentials to the SSO provider and the provider would send a token back. The service would then send us this token and we will verify it that is a valid token for our app.
+
+[pretty cool visualisations for the OAuth 2 and OpenID flow](https://developer.okta.com/blog/2019/10/21/illustrated-guide-to-oauth-and-oidc)
+
+Let's map our actors to the OAuth terminologies mapped [here](https://developer.okta.com/blog/2019/10/21/illustrated-guide-to-oauth-and-oidc)
+
+Let's say that our service is 'A' and the one that wants to use us is called 'B'.
+
+* Resource Owner = A team or organisation that has permissions in service B
+* Client = Service B
+* Authorization Server = Okta
+* Resource Server = Service A
+* Redirect URL = we don't need that
+* Response Type = default 'code' type is fine
+* Scope = we want global scopes for starters
+* Consent = we do not need that? :confused:
+* Client ID = We will go in Okta to create app and get this
+* Client Secret = from Okta too.
+* Authorization Code = Service B has to get this somehow ??? and sent it to Okta
+* Access Token = Service B will recieve this from Okta and send it to Service A
+
+(Side note) It is bad practice to keep passwords in source code. In my practice I use env. variables for the passwords and inject them in the environments in which the code is deployed, for example, by passing them as -e arguments to docker image. For the DB connection I will not bother to extract the password in env. var because it is in-memory and does not expose any ports.
+
+For the client id and secret, however, I will extract them as env. variables.
 ```diff
 - Design changed quite a bit during development, so it is better to look at the code, because Docs quickly get outdated.
 ```
