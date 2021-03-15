@@ -4,40 +4,61 @@
 
 package io.pleo.antaeus.rest
 
+import com.okta.jwt.Jwt
 import io.javalin.Javalin
-import io.javalin.apibuilder.ApiBuilder.get
-import io.javalin.apibuilder.ApiBuilder.path
+import io.javalin.apibuilder.ApiBuilder.*
+import io.pleo.antaeus.core.auth.OktaJWTVerifier
 import io.pleo.antaeus.core.exceptions.EntityNotFoundException
+import io.pleo.antaeus.core.services.BillingService
 import io.pleo.antaeus.core.services.CustomerService
 import io.pleo.antaeus.core.services.InvoiceService
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
-private val thisFile: () -> Unit = {}
 
 class AntaeusRest(
     private val invoiceService: InvoiceService,
-    private val customerService: CustomerService
+    private val customerService: CustomerService,
+    private val billingService: BillingService
 ) : Runnable {
 
+    private val unauthorizedMessage = "Missing or invalid token"
+    private val unauthorizedCode = 401
+
     override fun run() {
-        app.start(7000)
+        app.start((System.getenv("port") ?: "3000").toInt())
     }
 
     // Set up Javalin rest app
     private val app = Javalin
         .create()
         .apply {
-            // InvoiceNotFoundException: return 404 HTTP status code
+            before { ctx ->
+                run {
+                    val authHeaderVal = ctx.header("authorization")
+
+                    if (authHeaderVal == null ||
+                        authHeaderVal.split(" ").size != 2 ||
+                        !OktaJWTVerifier.verify(authHeaderVal.split(" ")[1])) {
+
+                        ctx.status(unauthorizedCode).result(unauthorizedMessage)
+                    }
+                }
+            }
+
             exception(EntityNotFoundException::class.java) { _, ctx ->
                 ctx.status(404)
             }
-            // Unexpected exception: return HTTP 500
-            exception(Exception::class.java) { e, _ ->
-                logger.error(e) { "Internal server error" }
+
+            exception(Exception::class.java) { e, ctx ->
+                logger.error(e) { "Internal server error: " + e.printStackTrace() }
+                ctx.status(500)
             }
-            // On 404: return message
+
             error(404) { ctx -> ctx.json("not found") }
+            error(500) { ctx -> ctx.json("internal server error")}
         }
 
     init {
@@ -47,13 +68,10 @@ class AntaeusRest(
                 it.result("Welcome to Antaeus! see AntaeusRest class for routes")
             }
             path("rest") {
-                // Route to check whether the app is running
-                // URL: /rest/health
                 get("health") {
                     it.json("ok")
                 }
 
-                // V1
                 path("v1") {
                     path("invoices") {
                         // URL: /rest/v1/invoices
@@ -64,6 +82,13 @@ class AntaeusRest(
                         // URL: /rest/v1/invoices/{:id}
                         get(":id") {
                             it.json(invoiceService.fetch(it.pathParam("id").toInt()))
+                        }
+
+                        // URL: /rest/v1/invoices/charge
+                        post("charge") {
+                            GlobalScope.launch {
+                                billingService.charge()
+                            }
                         }
                     }
 
