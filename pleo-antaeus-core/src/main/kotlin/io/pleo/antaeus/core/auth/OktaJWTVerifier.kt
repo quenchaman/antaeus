@@ -1,17 +1,14 @@
 package io.pleo.antaeus.core.auth
 
 import com.okta.jwt.AccessTokenVerifier
-import com.okta.jwt.Jwt
 import com.okta.jwt.JwtVerificationException
 import com.okta.jwt.JwtVerifiers
+import io.pleo.antaeus.core.utils.Environment
 
 object OktaJWTVerifier {
 
     private val jwtVerifier: AccessTokenVerifier = JwtVerifiers.accessTokenVerifierBuilder()
-        .setIssuer(
-//            System.getenv("OAUTH_ISSUER")
-        "https://dev-36600335.okta.com/oauth2/default"
-        )
+        .setIssuer(Environment.getOauthIssuer())
         .build()
 
     fun verify(jwt: String): Boolean {

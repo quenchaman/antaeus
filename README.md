@@ -37,6 +37,12 @@ Native java with sqlite (requires libsqlite3):
 
 If you use homebrew on MacOS `brew install sqlite`.
 
+Setup some env. variables
+
+```
+OAUTH_ISSUER=https://dev-36600335.okta.com/oauth2/default
+```
+
 ```
 ./gradlew run
 ```
@@ -143,7 +149,7 @@ Some DBs provide row level locking, so we could definitely improve the performan
 #### Initial Flow diagram
 ![sequence diagram](https://github.com/quenchaman/antaeus/blob/valeri-hristov/invoice-billing/CustomerPaymentsDesign.svg)
 
-#### My initial plan
+#### My initial plan :triumph:
 1. Method to fetch invoice by status. DAO-level method.
 2. Method to fetch unpaid invoices in InvoiceService that returns a Pair<Invoice, Customer>
 3. ExchangeInvoice method in Invoice Service that will check if there is a mismatch and send to ExchangeService for fix.
@@ -153,27 +159,26 @@ Some DBs provide row level locking, so we could definitely improve the performan
 
 (Note: methods 4 and 5 may be one method)
 
-#### Good ideas
+#### Good ideas :dash:
 - Return immediately from the controller that activates the billing, so that the client can do other useful work
 - (Done)Introduce logging.
 - Test coverage report.
 - (Done) It does not seem like a good design to fetch customer inside exchange service and other services, this should be non-nullable parameter to the methods
 
-#### What I will not do and justification
+#### What I will not do and justification :poop:
 * What: Test DAL level methods
 * Why: There should not be any business logic in a DAL method, so nothing to unit test. The connection to database will be tested during integration tests via other services that call the DAL.
 ---
 * What: I will not use JOINs between Invoice and Customer and change the customerId to customer in Invoice.
 * Why: With in memory DB I will just map the customers to invoices where needed, no memory overhead, but surely performance will suffer. If I go the route of changing Invoice model I will break the contract with PaymentProvider and it has to rebuild and redeploy. I can invent a new invoice class used just for carrying the Customer for the currency check, but for simplicity I will not.
 
-#### I won't have time for...
+#### I won't have time for... :neutral_face:
 - ExchangeProvider will make network requests to convert currency and there many things can go wrong, but I will cover only the happy path.
 - Having separate database for testing is a good practice. I will just mock the current one when testing.
-- Creating a Dal abstraction for the common operations on a table.
 - Create a REST endpoint on which the client can check the status of the billing.
 - Handle case when customer is null for an invoice.
 
-#### Things I could not figure out how to do
+#### Things I could not figure out how to do :tired_face:
 - I could not map a Pair<T, U?> to Pair<T, U> with the help of filter with U != null .... :/
 - How to mock a method in the same class that I am testing?
 
@@ -256,6 +261,18 @@ For the client id and secret, however, I will extract them as env. variables.
 Adding authentication is going alright, although I hit some roadblocks with Javalin and it's JWT utilities. It appears that I have to get the JavalinJWT class from source to extract the token from the header. I decided to create a method to do that and fix it in the future. technical_dept++ I will probably outsource the project after this feature :D
 
 Why is it so hard to find header keys constants...Are we supposed to know them by heart?
+
+I will pass the 'issuer' env. variable in docker-start script :flushed:, but in practice this would be injected in the environment where the container runs.
+
+I think I reached a point at which I am happy with the results and don't think I could spend more time on the project.
+
+Time spent: ~30 hours
+
+I really cannot separate clearly the time I worked on the project and the time I read Venkat Subramaniam's 'Programming Kotlin' book and youtube videos.
+
+A lot more could be improved and done, but I rely that we will discuss anything else on our meeting.
+
+I really enjoyed the problem, the project architecture and, of course, Kotlin! :neckbeard:
 
 ```diff
 - Design changed quite a bit during development, so it is better to look at the code, because Docs quickly get outdated.

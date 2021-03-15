@@ -24,6 +24,9 @@ class AntaeusRest(
     private val billingService: BillingService
 ) : Runnable {
 
+    private val unauthorizedMessage = "Missing or invalid token"
+    private val unauthorizedCode = 401
+
     override fun run() {
         app.start((System.getenv("port") ?: "3000").toInt())
     }
@@ -35,21 +38,12 @@ class AntaeusRest(
             before { ctx ->
                 run {
                     val authHeaderVal = ctx.header("authorization")
-                    val unauthorizedMessage = "Missing or invalid token"
-                    val unauthorizedCode = 401
 
-                    if (authHeaderVal == null) {
+                    if (authHeaderVal == null ||
+                        authHeaderVal.split(" ").size != 2 ||
+                        !OktaJWTVerifier.verify(authHeaderVal.split(" ")[1])) {
+
                         ctx.status(unauthorizedCode).result(unauthorizedMessage)
-                    } else {
-                        val authHeaderParts: List<String> = authHeaderVal.split(" ")
-
-                        if (authHeaderParts.size == 2) {
-                            if (!OktaJWTVerifier.verify(authHeaderParts[1])) {
-                                ctx.status(unauthorizedCode).result(unauthorizedMessage)
-                            } else {}
-                        } else {
-                            ctx.status(unauthorizedCode).result(unauthorizedMessage)
-                        }
                     }
                 }
             }
