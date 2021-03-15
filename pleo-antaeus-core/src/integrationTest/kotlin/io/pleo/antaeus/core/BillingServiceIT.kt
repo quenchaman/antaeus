@@ -20,7 +20,7 @@ import java.math.BigDecimal
 class BillingServiceIT {
 
     private val tables = arrayOf(InvoiceTable as Table, CustomerTable as Table)
-    private val testDb = DBConnection.connect("antaeus-test-db", tables)
+    private val testDb = SqLiteDBConnection.connect("antaeus-test-db", tables)
     private val invoiceDal = InvoiceDal(testDb)
     private val customerDal = CustomerDal(testDb)
     private val invoiceService = InvoiceService(invoiceDal)

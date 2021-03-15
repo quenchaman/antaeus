@@ -105,7 +105,6 @@ Happy hacking 😁!
 ![peter griffin's turn to sing](https://thumbs.gfycat.com/CreepyCrispAntbear-max-1mb.gif)
 ## Valeri's part now :information_desk_person:
 
-I :heart: Kotlin!!! I'd love to get this job! :sob:
 ### Invoice processing feature
 #### Strategic design
 On the first day of each month, charge all unpaid invoices. At the end, all invoices should be charged, except for the cases when the customer does not exist in the payment service or the service is down. Such cases should be recorded.
@@ -113,11 +112,11 @@ Use a service to exchange invoice currency that does not match customer's curren
 
 #### Tactical design
 * Problem: How we will schedule and run the procedure? 
-* Solution: Expose REST endpoint to trigger the procedure. Use SNS and CloudWatch to call the endpoint at specific time and call it every first day of a month at a time when traffic to the service is minimal (night time).
+* Solution: Expose REST endpoint to trigger the procedure. Use SNS and CloudWatch to call the endpoint at specific time and call it every first day of a month at a time when traffic to the service is minimal.
 * Alternatives: CRON if we have only one instance of the service, otherwise it can cause race conditions.
 ---
 * Problem: How do we get all unpaid invoices?
-* Solution: Add a procedure to select all Invoices with unpaid status. Use it in the solution's procedure.
+* Solution: Add a procedure to select all Invoices with unpaid status.
 * Further improvements: If the Invoices have a date we can select a date range for the previous month and have the problematic invoices handled by separate schedule. Otherwise each month the DB scan will grow larger.  
 ---
 * Problem: How do we charge the invoices?
@@ -127,14 +126,13 @@ Use a service to exchange invoice currency that does not match customer's curren
 * Solution: Do not retry this call, email or at least log the fact so that the appropriate department can resolve it.
 ---
 * Problem: How we handle failed calls with CurrencyMismatchException to the external API for charging an invoice?
-* Solution: Call external API to convert the amount of the Invoice to the currency of the customer. I would check the customer currency and invoice currency and send request to exchange the currencies in the invoice without actually persisting it on our end with the customer's currency.
-* Alternatives: Do the conversion ourselves ...not a good alternative..:)
+* Solution: Call external API to convert the amount of the Invoice to the currency of the customer. I would check the customer currency and invoice currency and send request to exchange the currencies.
 ---
 * Problem: How we handle failed calls with NetworkException to the external API for charging an invoice?
 * Solution: Retry 3 times...This may not be enough to finish our work on the invoices...See below.
 ---
 * Problem: What if the Payment service is not available?
-* Solution: We should really use a message queue between us and the payment service to make sure that we have some temporary storage for the invoice charge events if the service is not available.
+* Solution: We should really use a message queue between us and the payment service to make sure that we have some temporary storage for the invoice charge events if the service is not available. But we cannot tell the payment provider to poll a queue, probably they only have a REST API and get called by services like ours. We could retry the operation after some time.
 ---
 * Problem: How to make sure that REST endpoint to trigger the billing is omnipotent and we do not charge customer more than once?
 * Solution: After fetching the unpaid invoices we can mark them as 'sent for processing' in a transaction with the fetching itself. That way, the next transaction would find the DB in a state where the invoices are not 'pending'(not paid)
@@ -160,7 +158,7 @@ Some DBs provide row level locking, so we could definitely improve the performan
 (Note: methods 4 and 5 may be one method)
 
 #### Good ideas :dash:
-- Return immediately from the controller that activates the billing, so that the client can do other useful work
+- (Done)Return immediately from the controller that activates the billing, so that the client can do other useful work
 - (Done)Introduce logging.
 - Test coverage report.
 - (Done) It does not seem like a good design to fetch customer inside exchange service and other services, this should be non-nullable parameter to the methods
@@ -194,7 +192,7 @@ What else?
 2. ~~DSL~~ not much opportunities here, maybe some other time...
 3. ~~Abstract DAL class~~
 4. Test DB in container
-5. Multi-layer docker build
+5. ~~Multi-layer docker build~~ (there is already some caching mechanism I just do not understand it well enough)
 6. ~~Configuration file~~ (Kinda...)
 7. ~~Gradle task for integration and e2e tests~~
 
@@ -202,8 +200,6 @@ I copy-pasted the gradle configuration for extracting the integration tests in t
 Gradle is obfuscated as it is and using it via kotlin script makes it even "better" :D Integration test does not compile now because it cannot find references...
 
 Woo-hoo! It behaves!!! Now I will create a separate source and task for e2e tests. They will be run against a running service URL which we provide.
-
-This commit will be quite huge :D I do not do such commits in my professional practice, but sometimes it happens. I will go ahead just because I am working alone on this :) Forgive me.
 
 Woo-hoo!! E2E tests are up and running! Man, what is going on today...usually nothing works...
 

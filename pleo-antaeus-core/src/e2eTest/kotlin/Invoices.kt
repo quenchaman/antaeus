@@ -5,7 +5,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.util.concurrent.TimeUnit
 
 class Invoices {
 
@@ -25,6 +24,7 @@ class Invoices {
         val allInvoicesResponse = api.fetchAllInvoices("Bearer ${oauthData.access_token}").execute()
 
         Assertions.assertTrue(allInvoicesResponse.isSuccessful)
+
         val invoices = allInvoicesResponse.body()
 
         Assertions.assertNotNull(invoices)

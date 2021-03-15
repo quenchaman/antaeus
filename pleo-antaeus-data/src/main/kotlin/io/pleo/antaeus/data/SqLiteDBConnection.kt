@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 import java.sql.Connection
 
-class DBConnection {
+class SqLiteDBConnection {
     companion object {
         @JvmStatic
         fun connect(dbName: String, tables: Array<out Table>): Database {

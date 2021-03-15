@@ -20,7 +20,7 @@ import org.jetbrains.exposed.sql.Table
 fun main() {
     // The tables to create in the database.
     val tables = arrayOf(InvoiceTable as Table, CustomerTable as Table)
-    val db = DBConnection.connect("antaeus-db", tables)
+    val db = SqLiteDBConnection.connect("antaeus-db", tables)
 
     // Set up data access layer.
     val invoiceDal = InvoiceDal(db = db)
