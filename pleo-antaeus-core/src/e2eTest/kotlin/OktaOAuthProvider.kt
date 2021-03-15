@@ -6,14 +6,13 @@ import java.util.*
 
 object OktaOAuthProvider {
     fun fetchToken(): OAuthResponse {
-        val charset = Charsets.UTF_8
         val client = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
             .add("grant_type", "client_credentials")
             .add("scope", "AntaeusAdmin")
             .build()
         val token = Base64.getEncoder().encodeToString(
-            "0oabp6s3iJyiZhMMN5d6:cD42LkfdmgnMoNDqBfQPYIC5M3VFYlWqcTMFCoJ6".toByteArray(charset)
+            "0oabp6s3iJyiZhMMN5d6:cD42LkfdmgnMoNDqBfQPYIC5M3VFYlWqcTMFCoJ6".toByteArray(Charsets.UTF_8)
         )
 
         val request = Request.Builder()

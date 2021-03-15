@@ -11,8 +11,9 @@ class Invoices {
 
     @Test
     fun `will call endpoint to charge unpaid invoices`() {
+        val oauthData: OAuthResponse = OktaOAuthProvider.fetchToken()
         val api = Api.create()
-        val response = api.chargeInvoices().execute()
+        val response = api.chargeInvoices("Bearer ${oauthData.access_token}").execute()
 
         Assertions.assertTrue(response.isSuccessful)
 
@@ -21,7 +22,7 @@ class Invoices {
             delay(1000)
         }
 
-        val allInvoicesResponse = api.fetchAllInvoices().execute()
+        val allInvoicesResponse = api.fetchAllInvoices("Bearer ${oauthData.access_token}").execute()
 
         Assertions.assertTrue(allInvoicesResponse.isSuccessful)
         val invoices = allInvoicesResponse.body()

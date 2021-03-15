@@ -240,7 +240,12 @@ Let's say that our service is 'A' and the one that wants to use us is called 'B'
 
 (Side note) It is bad practice to keep passwords in source code. In my practice I use env. variables for the passwords and inject them in the environments in which the code is deployed, for example, by passing them as -e arguments to docker image. For the DB connection I will not bother to extract the password in env. var because it is in-memory and does not expose any ports.
 
-For the client id and secret, however, I will extract them as env. variables. 
+For the client id and secret, however, I will extract them as env. variables.
+
+#### 15.03.2021
+Adding authentication is going alright, although I hit some roadblocks with Javalin and it's JWT utilities. It appears that I have to get the JavalinJWT class from source to extract the token from the header. I decided to create a method to do that and fix it in the future. technical_dept++ I will probably outsource the project after this feature :D
+
+Why is it so hard to find header keys constants...Are we supposed to know them by heart?
 
 ```diff
 - Design changed quite a bit during development, so it is better to look at the code, because Docs quickly get outdated.

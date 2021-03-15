@@ -4,8 +4,10 @@
 
 package io.pleo.antaeus.rest
 
+import com.okta.jwt.Jwt
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
+import io.pleo.antaeus.core.auth.OktaJWTVerifier
 import io.pleo.antaeus.core.exceptions.EntityNotFoundException
 import io.pleo.antaeus.core.services.BillingService
 import io.pleo.antaeus.core.services.CustomerService
@@ -30,6 +32,28 @@ class AntaeusRest(
     private val app = Javalin
         .create()
         .apply {
+            before { ctx ->
+                run {
+                    val authHeaderVal = ctx.header("authorization")
+                    val unauthorizedMessage = "Missing or invalid token"
+                    val unauthorizedCode = 401
+
+                    if (authHeaderVal == null) {
+                        ctx.status(unauthorizedCode).result(unauthorizedMessage)
+                    } else {
+                        val authHeaderParts: List<String> = authHeaderVal.split(" ")
+
+                        if (authHeaderParts.size == 2) {
+                            if (!OktaJWTVerifier.verify(authHeaderParts[1])) {
+                                ctx.status(unauthorizedCode).result(unauthorizedMessage)
+                            } else {}
+                        } else {
+                            ctx.status(unauthorizedCode).result(unauthorizedMessage)
+                        }
+                    }
+                }
+            }
+
             exception(EntityNotFoundException::class.java) { _, ctx ->
                 ctx.status(404)
             }
