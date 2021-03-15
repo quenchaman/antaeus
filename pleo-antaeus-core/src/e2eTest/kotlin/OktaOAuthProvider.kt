@@ -1,24 +1,29 @@
 package io.pleo.antaeus.core.e2e
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.pleo.antaeus.core.utils.Environment
 import okhttp3.*
 import java.util.*
 
 object OktaOAuthProvider {
-    fun fetchToken(): OAuthResponse {
+    fun fetchToken(
+        clientId: String? = Environment.getOauthClientId() ?: "",
+        clientSecret: String? = Environment.getOauthClientSecret() ?: "",
+        issuer: String? = Environment.getOauthIssuer() ?: "",
+        scope: String? = Environment.getOauthScope() ?: ""
+    ): OAuthResponse {
         val client = OkHttpClient()
         val requestBody: RequestBody = FormBody.Builder()
             .add("grant_type", "client_credentials")
-            .add("scope", "AntaeusAdmin")
+            .add("scope", scope)
             .build()
-        val token = Base64.getEncoder().encodeToString(
-            "0oabp6s3iJyiZhMMN5d6:cD42LkfdmgnMoNDqBfQPYIC5M3VFYlWqcTMFCoJ6".toByteArray(Charsets.UTF_8)
-        )
+        val token = "${clientId}:${clientSecret}".toByteArray(Charsets.UTF_8)
+        val tokenBase64 = Base64.getEncoder().encodeToString(token)
 
         val request = Request.Builder()
-            .url("https://dev-36600335.okta.com/oauth2/default/v1/token")
+            .url("${issuer}/v1/token")
             .post(requestBody)
-            .addHeader("authorization", "Basic $token")
+            .addHeader("authorization", "Basic $tokenBase64")
             .build()
 
         val response: Response = client.newCall(request).execute()

@@ -49,6 +49,16 @@ Install docker for your platform
 ./docker-start.sh
 ```
 
+### Running E2E tests
+End-2-End tests require setting up some env. variables
+
+```
+OKTA_CLIENT_ID=your_okta_client_id
+OKTA_CLIENT_SECRET=your_okta_client_secret
+OAUTH_ISSUER=your_okta_issuer
+OAUTH_SCOPE=your_scope
+```
+
 ### App Structure
 The code given is structured as follows. Feel free however to modify the structure to fit your needs.
 ```
