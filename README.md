@@ -40,7 +40,7 @@ If you use homebrew on MacOS `brew install sqlite`.
 Setup some env. variables
 
 ```
-OAUTH_ISSUER=https://dev-36600335.okta.com/oauth2/default
+OAUTH_ISSUER=okta_issuer
 ```
 
 ```

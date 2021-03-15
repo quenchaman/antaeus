@@ -50,10 +50,4 @@ task<Test>("e2eTest") {
     testClassesDirs = sourceSets["e2eTest"].output.classesDirs
     classpath = sourceSets["e2eTest"].runtimeClasspath
     useJUnitPlatform()
-
-    systemProperty("apiUrl", System.getProperty("apiUrl") ?: "http://localhost:7000")
-    systemProperty("CLIENT_ID", "0oabp6s3iJyiZhMMN5d6")
-    systemProperty("CLIENT_SECRET", "cD42LkfdmgnMoNDqBfQPYIC5M3VFYlWqcTMFCoJ6")
-    environment("OAUTH_ISSUER", "https://dev-36600335.okta.com/oauth2/default")
-    environment("OAUTH_SCOPE", "AntaeusAdmin")
 }

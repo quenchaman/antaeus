@@ -20,13 +20,13 @@ class BillingService(
     fun prepareInvoicesForPayment(): List<Invoice> {
         logger.info("Preparing invoices for payment...")
 
-        val (mismatched, matching) = invoiceService.fetchUnpaid()
+        val (withDifferentCurrency, withSameCurrency) = invoiceService.fetchUnpaid()
             .partition { exchangeService.checkCurrencyMismatch(it.first, it.second) }
 
-        logger.info("Fetched ${mismatched.size} currency mismatching invoices and ${matching.size} matching invoices.")
+        logger.info("Fetched ${withDifferentCurrency.size} currency mismatching invoices and ${withSameCurrency.size} matching invoices.")
 
-        return matching.map { it.first } +
-                mismatched.map { exchangeService.exchangeInvoiceAmountToCustomerCurrency(it.first, it.second) }
+        return withSameCurrency.map { it.first } +
+                withDifferentCurrency.map { exchangeService.exchangeInvoiceAmountToCustomerCurrency(it.first, it.second) }
     }
 
     fun charge() = runBlocking {
