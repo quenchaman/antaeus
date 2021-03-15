@@ -17,7 +17,7 @@ Please let us know how long the challenge takes you. We're not looking for how s
 ## Developing
 
 Requirements:
-- \>= Java 11 environment
+- \>= Java 11 environment (I used 11.0.10 HotSpot, because I had issues with mockk.
 
 Open the project using your favorite text editor. If you are using IntelliJ, you can open the `build.gradle.kts` file and it is gonna setup the project in the IDE for you.
 
@@ -267,6 +267,8 @@ I will pass the 'issuer' env. variable in docker-start script :flushed:, but in 
 I think I reached a point at which I am happy with the results and don't think I could spend more time on the project.
 
 Time spent: ~30 hours
+
+Coffees drank: 30
 
 I really cannot separate clearly the time I worked on the project and the time I read Venkat Subramaniam's 'Programming Kotlin' book and youtube videos.
 
