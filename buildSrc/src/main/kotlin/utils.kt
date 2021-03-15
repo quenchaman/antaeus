@@ -14,6 +14,9 @@ fun Project.kotlinProject() {
         "implementation"(kotlin("stdlib"))
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2")
 
+        "implementation"("com.okta.jwt:okta-jwt-verifier:0.5.0")
+        "implementation"("com.okta.jwt:okta-jwt-verifier-impl:0.5.0")
+
         // Logging
         "implementation"("org.slf4j:slf4j-simple:1.7.30")
         "implementation"("io.github.microutils:kotlin-logging:1.7.8")
